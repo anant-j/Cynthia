@@ -1,4 +1,5 @@
 from flask import Flask
+import requests
 
 app = Flask(__name__)
 
@@ -10,7 +11,15 @@ def request():
 
 @app.route('/', methods=['GET'])
 def receive():
-    return 'this is get request'
+    headers = {
+        'Content-Type': 'application/json',
+    }
+
+    data = open('D:\\Downloads\\tone.json', 'rb').read()
+    response = requests.post(
+        'url',
+        headers=headers, data=data, auth=('apikey', 'api'))
+    return response.json()
 
 
 if __name__ == '__main__':
