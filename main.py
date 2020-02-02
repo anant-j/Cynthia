@@ -7,21 +7,18 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def send():
-    return (json.dumps({"response": str("Please check console for results!")}))
+    return (json.dumps({"response": str("Thank you for using the service.")}))
 
 @app.route('/', methods=['POST'])
 def receive():
-    # return("Hello")
     headers = {
         'Content-Type': 'application/json',
     }
     d={}
-    # data = open('tone.json', 'rb').read()
     inp_data = str(request.form['request'])
     x = {
   "text": inp_data
     }
-# convert into JSON:
     data = json.dumps(x)
     print(data)
     response = requests.post(
