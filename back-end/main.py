@@ -11,7 +11,7 @@ db = client['MsRogers']
 
 @app.route('/stats', methods=["POST"])
 def add_sentiment_value():
-    response = {"date": datetime.datetime.utcnow(), "score": request.json["data"]}
+    response = {"date": datetime.datetime.utcnow(), "score": request.form["data"]}
     try:
         db.sentiments.insert_one(response)
     except:
@@ -21,16 +21,16 @@ def add_sentiment_value():
 
 @app.route('/stats', methods=["GET"])
 def get_stats():
-    limit_size = request.json["limit"]
-    try:
-        return dumps(list(db.sentiments.find().sort("date", -1).limit(limit_size)))
-    except:
-        return json.dumps({"response": False})
+    limit_size = int(request.form["limit"])
+    # try:
+    return dumps(list(db.sentiments.find().sort("date", -1).limit(limit_size)))
+    # except:
+        # return json.dumps({"response": False})
 
 
 @app.route('/conversation', methods=["POST"])
 def add_conversation():
-    response = {"question": request.json["question"], "answer" : request.json["answer"]}
+    response = {"question": request.form["question"], "answer" : request.form["answer"]}
     try:
         db.conversation_log.insert_one(response)
     except:
@@ -40,7 +40,7 @@ def add_conversation():
 
 @app.route('/conversation', methods=["GET"])
 def get_conversation():
-    limit_size = request.json["limit"]
+    limit_size = int(request.form["limit"])
     try:
         return dumps(list(db.conversation_log.find().sort("date", -1).limit(limit_size)))
     except:

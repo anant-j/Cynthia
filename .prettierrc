@@ -1,0 +1,6 @@
+{
+  "printWidth": 100,
+  "requireConfig": true,
+  "singleQuote": true,
+  "trailingComma": "all"
+}
