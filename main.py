@@ -11,15 +11,18 @@ def request():
 
 @app.route('/', methods=['GET'])
 def receive():
+    # return("Hello")
     headers = {
         'Content-Type': 'application/json',
     }
-
-    data = open('D:\\Downloads\\tone.json', 'rb').read()
+    d={}
+    data = open('tone.json', 'rb').read()
     response = requests.post(
         'url',
-        headers=headers, data=data, auth=('apikey', 'api'))
-    return response.json()
+        headers=headers, data=data, auth=('apikey', 'key'))
+    for responses in response.json()['document_tone']['tones']:  
+        d[str(responses['tone_id'])]=responses['score']
+    return(str(d))
 
 
 if __name__ == '__main__':
