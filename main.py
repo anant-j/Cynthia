@@ -5,6 +5,14 @@ import requests
 from twilio.rest import Client
 from twilio.http.http_client import TwilioHttpClient
 
+global anger
+global fear
+global joy
+global sadness
+global analytical
+global confident
+global tentative
+
 app = Flask(__name__)
 
 with open('twilio_keys.json') as f:
@@ -13,28 +21,100 @@ with open('twilio_keys.json') as f:
     auth_token = tw_keys['MY_AUTH_TOKEN']
 
 client = Client(account_sid, auth_token)
+PAPERQUOTES_API_ENDPOINT = 'http://api.paperquotes.com/apiv1/quotes?tags=love&limit=5'
+TOKEN = '5c62454a0cf6fb27d2cdc79edecb890eb16e7d0e'
+
+
+@app.route('/q/', methods=['GET'])
+def sendQuote():
+    response = requests.get(PAPERQUOTES_API_ENDPOINT, headers={'Authorization': 'TOKEN {}'.format(TOKEN)})
+
+    if response.ok:
+
+        quotes = json.loads(response.text).get('results')
+
+        for quote in quotes:
+            print(quote.get('quote'))
+            print(quote.get('author'))
+            print(quote.get('tags'))
+    return
+
 
 @app.route('/', methods=['GET'])
 def send():
-    return (json.dumps({"response": str("Thank you for using the service.")}))
+    global anger
+    global fear
+    global joy
+    global sadness
+    global analytical
+    global confident
+    global tentative
+    arr = [anger, fear, joy, sadness, analytical, confident, tentative]
+    arr.sort()
+    if anger == arr.index(0):
+        first = anger
+    elif anger == arr.index(1):
+        second = anger
+    elif fear == arr.index(0):
+        first = fear
+    elif fear == arr.index(1):
+        second = fear
+    elif joy == arr.index(0):
+        first = joy
+    elif joy == arr.index(1):
+        second = joy
+    elif sadness == arr.index(0):
+        first = sadness
+    elif sadness == arr.index(1):
+        second = sadness
+    elif confident == arr.index(0):
+        first = confident
+    elif confident == arr.index(1):
+        second = confident
+    elif analytical == arr.index(0):
+        first = analytical
+    else:
+        second = analytical
+    return json.dumps({"response": str(first + ',' + second)})
+
 
 @app.route('/', methods=['POST'])
 def receive():
     headers = {
         'Content-Type': 'application/json',
     }
-    d={}
+    d = {}
     inp_data = str(request.form['request'])
     x = {
-  "text": inp_data
+        "text": inp_data
     }
     data = json.dumps(x)
     response = requests.post(
-        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
+        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/'
+        '9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
         headers=headers, data=data, auth=('apikey', 'key'))
-    for responses in response.json()['document_tone']['tones']:  
-        d[str(responses['tone_id'])]=responses['score']
-    return(str(d))
+    for responses in response.json()['document_tone']['tones']:
+        d[str(responses['tone_id'])] = responses['score']
+        if responses['tone_id'] is 'anger':
+            global anger
+            anger += responses['score']
+        elif responses['tone_id'] is 'fear':
+            global fear
+            fear += responses['score']
+        elif responses['tone_id'] is 'joy':
+            global joy
+            joy += responses['score']
+        elif responses['tone_id'] is 'sadness':
+            global sadness
+            sadness += responses['score']
+        elif responses['tone_id'] is 'confident':
+            global confident
+            confident += responses['score']
+        else:
+            global analytical
+            analytical += responses['score']
+    return str(d)
+
 
 @app.route('/sms', methods=['POST'])
 def sms():
@@ -51,26 +131,47 @@ def sms():
 
 def send_sms(message_content, contact):
     client.messages.create(
-    to=contact,
-    from_=tw_keys['MY_TWILIO_NUMBER'],
-    body=str(receiveContent(str(message_content)))
+        to=contact,
+        from_=tw_keys['MY_TWILIO_NUMBER'],
+        body=str(receiveContent(str(message_content)))
     )
+
 
 def receiveContent(content):
     headers = {
         'Content-Type': 'application/json',
     }
-    d={}
+    d = {}
     x = {
-  "text": content
+        "text": content
     }
     data = json.dumps(x)
     response = requests.post(
-        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
+        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/'
+        '9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
         headers=headers, data=data, auth=('apikey', 'key'))
-    for responses in response.json()['document_tone']['tones']:  
-        d[str(responses['tone_id'])]=responses['score']
-    return(str(d))
+    for responses in response.json()['document_tone']['tones']:
+        d[str(responses['tone_id'])] = responses['score']
+        if responses['tone_id'] is 'anger':
+            global anger
+            anger += responses['score']
+        elif responses['tone_id'] is 'fear':
+            global fear
+            fear += responses['score']
+        elif responses['tone_id'] is 'joy':
+            global joy
+            joy += responses['score']
+        elif responses['tone_id'] is 'sadness':
+            global sadness
+            sadness += responses['score']
+        elif responses['tone_id'] is 'confident':
+            global confident
+            confident += responses['score']
+        else:
+            global analytical
+            analytical += responses['score']
+    return str(d)
+
 
 if __name__ == '__main__':
     app.run()
