@@ -1,3 +1,5 @@
+import operator
+
 from flask import Flask
 from flask import request
 import json
@@ -54,34 +56,45 @@ def send():
     arr = [anger, fear, joy, sadness, analytical, confident, tentative]
     arr.sort()
     if anger == arr.index(0):
-        first = anger
+        first = anger/numOfSentences
     elif anger == arr.index(1):
-        second = anger
+        second = anger/numOfSentences
     elif fear == arr.index(0):
-        first = fear
+        first = fear/numOfSentences
     elif fear == arr.index(1):
-        second = fear
+        second = fear/numOfSentences
     elif joy == arr.index(0):
-        first = joy
+        first = joy/numOfSentences
     elif joy == arr.index(1):
-        second = joy
+        second = joy/numOfSentences
     elif sadness == arr.index(0):
-        first = sadness
+        first = sadness/numOfSentences
     elif sadness == arr.index(1):
-        second = sadness
+        second = sadness/numOfSentences
     elif confident == arr.index(0):
-        first = confident
+        first = confident/numOfSentences
     elif confident == arr.index(1):
-        second = confident
+        second = confident/numOfSentences
+    elif tentative == arr.index(0):
+        first = tentative/numOfSentences
+    elif tentative == arr.index(1):
+        second = tentative/numOfSentences
     elif analytical == arr.index(0):
-        first = analytical
+        first = analytical/numOfSentences
     else:
-        second = analytical
+        second = analytical/numOfSentences
     return json.dumps({"response": str(first + ',' + second)})
 
 
 @app.route('/', methods=['POST'])
 def receive():
+    anger_local = 0
+    fear_local = 0
+    joy_local = 0
+    sadness_local = 0
+    confident_local = 0
+    tentative_local = 0
+    analytical_local = 0
     headers = {
         'Content-Type': 'application/json',
     }
@@ -95,39 +108,57 @@ def receive():
     data = json.dumps(x)
     response = requests.post(
         'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
-        headers=headers, data=data, auth=('apikey', 'key'))
+        headers=headers, data=data, auth=('apikey', ''))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
-        if responses['tone_id'] is 'anger':
+        if responses['tone_id'] == 'anger':
             global anger
             if anger is None:
                 anger = 0
             anger += responses['score']
-        elif responses['tone_id'] is 'fear':
+            anger_local = responses['score']
+        elif responses['tone_id'] == 'fear':
             global fear
             if fear is None:
                 fear = 0
             fear += responses['score']
-        elif responses['tone_id'] is 'joy':
+            fear_local = responses['score']
+        elif responses['tone_id'] == 'joy':
             global joy
             if joy is None:
                 joy = 0
             joy += responses['score']
-        elif responses['tone_id'] is 'sadness':
+            joy_local = responses['score']
+        elif responses['tone_id'] == 'sadness':
             global sadness
             if sadness is None:
                 sadness = 0
             sadness += responses['score']
-        elif responses['tone_id'] is 'confident':
+            sadness_local = responses['score']
+        elif responses['tone_id'] == 'confident':
             global confident
             if confident is None:
                 confident = 0
             confident += responses['score']
+            confident_local = responses['score']
+        elif responses['tone_id'] == 'tentative':
+            global tentative
+            if tentative is None:
+                tentative = 0
+            tentative += responses['score']
+            tentative_local = responses['score']
         else:
             global analytical
             if analytical is None:
                 analytical = 0
             analytical += responses['score']
+            analytical_local = responses['score']
+    dict1 = {'Anger':anger_local, 'Fear':fear_local,'Joy':joy_local,'Sadness':sadness_local,'Confident':confident_local,
+             'Tentative':tentative_local,'Analytical':analytical_local}
+    saver = max(dict1.items(), key=operator.itemgetter(1))[0]
+    for key,value in dict1.items():
+        if value == saver:
+            return key
     return str(d)
 
 
@@ -163,7 +194,7 @@ def receiveContent(content):
     data = json.dumps(x)
     response = requests.post(
         'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
-        headers=headers, data=data, auth=('apikey', 'key'))
+        headers=headers, data=data, auth=('apikey', ''))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
         if responses['tone_id'] is 'anger':
@@ -191,6 +222,11 @@ def receiveContent(content):
             if confident is None:
                 confident = 0
             confident += responses['score']
+        elif responses['tone_id'] is 'tentative':
+            global tentative
+            if tentative is None:
+                tentative = 0
+            tentative += responses['score']
         else:
             global analytical
             if analytical is None:
