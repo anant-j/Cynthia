@@ -29,21 +29,6 @@ PAPERQUOTES_API_ENDPOINT = 'http://api.paperquotes.com/apiv1/quotes?tags=love&li
 TOKEN = '5c62454a0cf6fb27d2cdc79edecb890eb16e7d0e'
 
 
-@app.route('/q/', methods=['GET'])
-def sendQuote():
-    response = requests.get(PAPERQUOTES_API_ENDPOINT, headers={'Authorization': 'TOKEN {}'.format(TOKEN)})
-
-    if response.ok:
-
-        quotes = json.loads(response.text).get('results')
-
-        for quote in quotes:
-            print(quote.get('quote'))
-            print(quote.get('author'))
-            print(quote.get('tags'))
-    return
-
-
 @app.route('/', methods=['GET'])
 def send():
     global anger
@@ -108,7 +93,7 @@ def receive():
     data = json.dumps(x)
     response = requests.post(
         'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
-        headers=headers, data=data, auth=('apikey', ''))
+        headers=headers, data=data, auth=('apikey', 'key'))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
         if responses['tone_id'] == 'anger':
@@ -157,9 +142,10 @@ def receive():
              'Tentative':tentative_local,'Analytical':analytical_local}
     saver = max(dict1.items(), key=operator.itemgetter(1))[0]
     for key,value in dict1.items():
-        if value == saver:
-            return key
-    return str(d)
+        if value == max(dict1.items(), key=operator.itemgetter(1))[1]:
+            abc = {'highestSentiment' : key}
+            return json.dumps(abc)
+    return json.dumps(d)
 
 
 @app.route('/sms', methods=['POST'])
@@ -194,7 +180,7 @@ def receiveContent(content):
     data = json.dumps(x)
     response = requests.post(
         'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
-        headers=headers, data=data, auth=('apikey', ''))
+        headers=headers, data=data, auth=('apikey', 'key'))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
         if responses['tone_id'] is 'anger':
