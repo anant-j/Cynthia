@@ -1,0 +1,23 @@
+Metadata-Version: 1.1
+Name: twilio-api
+Version: 0.1.1
+Summary: Twilio API
+Home-page: http://twilio_api.hive.pt
+Author: Hive Solutions Lda.
+Author-email: development@hive.pt
+License: GNU General Public License (GPL), Version 3
+Description: UNKNOWN
+Keywords: twilio api
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Topic :: Utilities
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.0
+Classifier: Programming Language :: Python :: 3.1
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4

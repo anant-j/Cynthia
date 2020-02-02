@@ -5,13 +5,15 @@ import requests
 from twilio.rest import Client
 from twilio.http.http_client import TwilioHttpClient
 
-global anger
-global fear
-global joy
-global sadness
-global analytical
-global confident
-global tentative
+anger = 0
+fear = 0
+joy = 0
+sadness = 0
+analytical = 0
+confident = 0
+tentative = 0
+numOfSentences = 0
+
 
 app = Flask(__name__)
 
@@ -85,33 +87,46 @@ def receive():
     }
     d = {}
     inp_data = str(request.form['request'])
+    global numOfSentences
+    numOfSentences += 1
     x = {
         "text": inp_data
     }
     data = json.dumps(x)
     response = requests.post(
-        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/'
-        '9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
+        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
         headers=headers, data=data, auth=('apikey', 'key'))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
         if responses['tone_id'] is 'anger':
             global anger
+            if anger is None:
+                anger = 0
             anger += responses['score']
         elif responses['tone_id'] is 'fear':
             global fear
+            if fear is None:
+                fear = 0
             fear += responses['score']
         elif responses['tone_id'] is 'joy':
             global joy
+            if joy is None:
+                joy = 0
             joy += responses['score']
         elif responses['tone_id'] is 'sadness':
             global sadness
+            if sadness is None:
+                sadness = 0
             sadness += responses['score']
         elif responses['tone_id'] is 'confident':
             global confident
+            if confident is None:
+                confident = 0
             confident += responses['score']
         else:
             global analytical
+            if analytical is None:
+                analytical = 0
             analytical += responses['score']
     return str(d)
 
@@ -147,28 +162,39 @@ def receiveContent(content):
     }
     data = json.dumps(x)
     response = requests.post(
-        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/'
-        '9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
+        'https://api.us-south.tone-analyzer.watson.cloud.ibm.com/instances/9decad53-7281-4d48-8c86-f105d1f42122/v3/tone?version=2017-09-21',
         headers=headers, data=data, auth=('apikey', 'key'))
     for responses in response.json()['document_tone']['tones']:
         d[str(responses['tone_id'])] = responses['score']
         if responses['tone_id'] is 'anger':
             global anger
+            if anger is None:
+                anger = 0
             anger += responses['score']
         elif responses['tone_id'] is 'fear':
             global fear
+            if fear is None:
+                fear = 0
             fear += responses['score']
         elif responses['tone_id'] is 'joy':
             global joy
+            if joy is None:
+                joy = 0
             joy += responses['score']
         elif responses['tone_id'] is 'sadness':
             global sadness
+            if sadness is None:
+                sadness = 0
             sadness += responses['score']
         elif responses['tone_id'] is 'confident':
             global confident
+            if confident is None:
+                confident = 0
             confident += responses['score']
         else:
             global analytical
+            if analytical is None:
+                analytical = 0
             analytical += responses['score']
     return str(d)
 
