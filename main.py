@@ -26,7 +26,7 @@ with open('twilio_keys.json') as f:
 
 client = Client(account_sid, auth_token)
 PAPERQUOTES_API_ENDPOINT = 'http://api.paperquotes.com/apiv1/quotes?tags=love&limit=5'
-TOKEN = '5c62454a0cf6fb27d2cdc79edecb890eb16e7d0e'
+TOKEN = ''
 
 
 @app.route('/', methods=['GET'])
